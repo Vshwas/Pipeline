@@ -1,0 +1,105 @@
+name: CDKTF Azure Module Updater — Claude Code Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      module_path:
+        description: 'Path to the module inside this repo (e.g. demo/17_Azure_ACR)'
+        required: true
+        default: 'demo/17_Azure_ACR'
+      provider_version:
+        description: 'Target azurerm provider version'
+        required: true
+        default: '4.64.0'
+
+jobs:
+  update-module:
+    name: Update CDKTF Module with Claude Code
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install CDKTF CLI
+        run: npm install -g cdktf-cli
+
+      - name: Install module dependencies
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          npm install
+          npm run get
+        continue-on-error: true
+
+      - name: Run Claude Code — Update CDKTF Module
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: "Bash,Read,Write,Edit,Glob,Grep"
+          prompt: |
+            You are updating the CDKTF Azure module at: ${{ github.event.inputs.module_path }}
+            Target azurerm provider version: ${{ github.event.inputs.provider_version }}
+
+            Follow these exact steps:
+
+            STEP 1 — Update cdktf.json
+            In ${{ github.event.inputs.module_path }}/cdktf.json, set:
+              "terraformProviders": ["registry.terraform.io/hashicorp/azurerm@${{ github.event.inputs.provider_version }}"]
+
+            STEP 2 — Fix main.ts imports
+            In ${{ github.event.inputs.module_path }}/main.ts:
+            - Change any import from "@cdktf/provider-azurerm" to use sub-paths under "./.gen/providers/azurerm/"
+              For example:
+                AzurermProvider  → import from "./.gen/providers/azurerm/provider"
+                ContainerRegistry → import from "./.gen/providers/azurerm/container-registry"
+            - The cdktf and constructs imports stay unchanged.
+
+            STEP 3 — Fix deprecated arguments
+            In ${{ github.event.inputs.module_path }}/main.ts:
+            - Replace  retentionPolicy:[{ days: X, enabled: Y }]  with  retentionPolicyInDays: X
+            - Remove the Retention_Policy_Enabled TerraformVariable declaration (no longer supported)
+            - Replace  features: { }  with  features: [{}]
+
+            STEP 4 — Fix tsconfig.json
+            In ${{ github.event.inputs.module_path }}/tsconfig.json:
+            - Remove the line with "charset": "utf8"
+
+            STEP 5 — Show a clear summary
+            Print a summary showing:
+            - What files were changed
+            - What specific changes were made in each file
+            - Confirm the new provider version is set correctly
+
+      - name: Show git diff
+        run: git diff
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "Claude Code Bot"
+          git config user.email "claude-code-bot@github-actions"
+          git checkout -b claude/cdktf-update-${{ github.event.inputs.provider_version }}-$(date +%Y%m%d%H%M%S)
+          git add ${{ github.event.inputs.module_path }}/
+          git commit -m "chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${{ github.event.inputs.provider_version }} via Claude Code"
+          git push origin HEAD
+
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${{ github.event.inputs.provider_version }}`,
+              body: `## Automated CDKTF Module Update\n\n**Module:** \`${{ github.event.inputs.module_path }}\`\n**Provider version:** azurerm \`${{ github.event.inputs.provider_version }}\`\n\n### Changes made by Claude Code\n- Updated \`cdktf.json\` provider version\n- Fixed \`main.ts\` imports to use \`.gen/\` sub-paths\n- Replaced deprecated \`retentionPolicy\` block with \`retentionPolicyInDays\`\n- Fixed \`features: {}\` → \`features: [{}]\`\n- Removed deprecated \`charset\` from \`tsconfig.json\`\n\n> Generated automatically by [Claude Code](https://claude.ai/code)`,
+              head: `claude/cdktf-update-${{ github.event.inputs.provider_version }}-$(date +%Y%m%d%H%M%S)`,
+              base: 'master'
+            });
+            console.log(`PR created: ${pr.html_url}`);
