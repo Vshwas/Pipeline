@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '18'
 
       - name: Run Claude Code — Update CDKTF Module
         uses: anthropics/claude-code-action@beta
