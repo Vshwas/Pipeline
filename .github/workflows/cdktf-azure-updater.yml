@@ -30,22 +30,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install CDKTF CLI
-        run: npm install -g cdktf-cli
-        continue-on-error: true
-
-      - name: Install module dependencies
-        working-directory: ${{ github.event.inputs.module_path }}
-        run: |
-          npm install
-          npm run get
-        continue-on-error: true
-
       - name: Run Claude Code — Update CDKTF Module
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          mode: agent
           allowed_tools: "Bash,Read,Write,Edit,Glob,Grep"
           direct_prompt: |
             You are updating the CDKTF Azure module at: ${{ github.event.inputs.module_path }}
