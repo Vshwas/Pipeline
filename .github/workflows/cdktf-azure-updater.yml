@@ -8,9 +8,9 @@ on:
         required: true
         default: 'demo/17_Azure_ACR'
       provider_version:
-        description: 'Target azurerm provider version'
-        required: true
-        default: '4.64.0'
+        description: 'Target azurerm provider version (leave empty to fetch latest from Terraform Registry)'
+        required: false
+        default: ''
 
 jobs:
   update-module:
@@ -36,18 +36,40 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           mode: agent
-          allowed_tools: "Bash,Read,Write,Edit,Glob,Grep"
+          allowed_tools: "Bash,Read,Write,Edit,Glob,Grep,mcp__terraform__get_latest_provider_version,mcp__terraform__get_provider_details,mcp__terraform__get_provider_capabilities"
+          mcp_config: |
+            {
+              "mcpServers": {
+                "terraform": {
+                  "command": "npx",
+                  "args": ["-y", "@hashicorp/mcp-terraform-registry@latest"],
+                  "env": {}
+                }
+              }
+            }
           direct_prompt: |
             You are updating the CDKTF Azure module at: ${{ github.event.inputs.module_path }}
-            Target azurerm provider version: ${{ github.event.inputs.provider_version }}
 
-            Follow these exact steps:
+            STEP 0 — Determine provider version
+            The user-specified version is: "${{ github.event.inputs.provider_version }}"
+
+            - If the user provided a version (non-empty), use that exact version.
+            - If empty, use the Terraform MCP tool `mcp__terraform__get_latest_provider_version`
+              with namespace="hashicorp" and type="azurerm" to fetch the latest version
+              from the Terraform Registry. Use that fetched version for all steps below.
+
+            Print the version you will use before proceeding.
 
             STEP 1 — Update cdktf.json
             In ${{ github.event.inputs.module_path }}/cdktf.json, set:
-              "terraformProviders": ["registry.terraform.io/hashicorp/azurerm@${{ github.event.inputs.provider_version }}"]
+              "terraformProviders": ["registry.terraform.io/hashicorp/azurerm@<version>"]
 
-            STEP 2 — Fix main.ts imports
+            STEP 2 — Use Terraform MCP to check provider details
+            Call `mcp__terraform__get_provider_details` with namespace="hashicorp", type="azurerm",
+            and the chosen version to understand what changed in this version.
+            Use this information to identify any additional deprecated arguments in the module.
+
+            STEP 3 — Fix main.ts imports
             In ${{ github.event.inputs.module_path }}/main.ts:
             - Change any import from "@cdktf/provider-azurerm" to use sub-paths under "./.gen/providers/azurerm/"
               For example:
@@ -55,21 +77,22 @@ jobs:
                 ContainerRegistry → import from "./.gen/providers/azurerm/container-registry"
             - The cdktf and constructs imports stay unchanged.
 
-            STEP 3 — Fix deprecated arguments
+            STEP 4 — Fix deprecated arguments
             In ${{ github.event.inputs.module_path }}/main.ts:
             - Replace  retentionPolicy:[{ days: X, enabled: Y }]  with  retentionPolicyInDays: X
             - Remove the Retention_Policy_Enabled TerraformVariable declaration (no longer supported)
             - Replace  features: { }  with  features: [{}]
+            - Fix any other deprecated arguments identified from the provider details in STEP 2.
 
-            STEP 4 — Fix tsconfig.json
+            STEP 5 — Fix tsconfig.json
             In ${{ github.event.inputs.module_path }}/tsconfig.json:
             - Remove the line with "charset": "utf8"
 
-            STEP 5 — Show a clear summary
+            STEP 6 — Show a clear summary
             Print a summary showing:
+            - Provider version used (and whether it was user-provided or fetched from registry)
             - What files were changed
             - What specific changes were made in each file
-            - Confirm the new provider version is set correctly
 
       - name: Show git diff
         run: git diff
@@ -77,13 +100,15 @@ jobs:
       - name: Commit and push changes
         id: commit
         run: |
-          BRANCH="claude/cdktf-update-${{ github.event.inputs.provider_version }}-$(date +%Y%m%d%H%M%S)"
+          VERSION="${{ github.event.inputs.provider_version }}"
+          if [ -z "$VERSION" ]; then VERSION="latest"; fi
+          BRANCH="claude/cdktf-update-${VERSION}-$(date +%Y%m%d%H%M%S)"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
           git config user.name "Claude Code Bot"
           git config user.email "claude-code-bot@github-actions"
           git checkout -b $BRANCH
           git add ${{ github.event.inputs.module_path }}/
-          git diff --cached --quiet || git commit -m "chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${{ github.event.inputs.provider_version }} via Claude Code"
+          git diff --cached --quiet || git commit -m "chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${VERSION} via Claude Code"
           git push origin $BRANCH
 
       - name: Create Pull Request
@@ -91,11 +116,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const version = '${{ github.event.inputs.provider_version }}' || 'latest';
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${{ github.event.inputs.provider_version }}`,
-              body: `## Automated CDKTF Module Update\n\n**Module:** \`${{ github.event.inputs.module_path }}\`\n**Provider version:** azurerm \`${{ github.event.inputs.provider_version }}\`\n\n### Changes made by Claude Code\n- Updated \`cdktf.json\` provider version\n- Fixed \`main.ts\` imports to use \`.gen/\` sub-paths\n- Replaced deprecated \`retentionPolicy\` block with \`retentionPolicyInDays\`\n- Fixed \`features: {}\` → \`features: [{}]\`\n- Removed deprecated \`charset\` from \`tsconfig.json\`\n\n> Generated automatically by [Claude Code](https://claude.ai/code)`,
+              title: `chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${version}`,
+              body: `## Automated CDKTF Module Update\n\n**Module:** \`${{ github.event.inputs.module_path }}\`\n**Provider version:** azurerm \`${version}\`\n**Version source:** ${version === 'latest' ? 'Fetched automatically from Terraform Registry via MCP' : 'User specified'}\n\n### Changes made by Claude Code\n- Updated \`cdktf.json\` provider version\n- Fixed \`main.ts\` imports to use \`.gen/\` sub-paths\n- Fixed deprecated arguments based on Terraform Registry provider details\n- Removed deprecated \`charset\` from \`tsconfig.json\`\n\n> Generated automatically by [Claude Code](https://claude.ai/code) using Terraform Registry MCP`,
               head: '${{ steps.commit.outputs.branch }}',
               base: 'master'
             });
