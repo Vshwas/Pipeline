@@ -1,0 +1,11 @@
+{
+  "name": "cdktf-azure-updater",
+  "version": "1.0.0",
+  "description": "Automates CDKTF Azure module update workflow: provider version bump, npm install, import fixes, synth, and terraform plan",
+  "author": {
+    "name": "Vshwas",
+    "url": "https://github.com/Vshwas/Pipeline"
+  },
+  "repository": "https://github.com/Vshwas/Pipeline",
+  "keywords": ["cdktf", "azure", "terraform", "azurerm", "typescript"]
+}
