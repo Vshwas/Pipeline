@@ -156,12 +156,31 @@ You provide two inputs:
 │                                                                 │
 │    Edit → removes "charset": "utf8" (deprecated in TS 5.x)    │
 │                                                                 │
-│  ── SUB-STEP 6: Print Summary ──                               │
+│  ── SUB-STEP 6: Run cdktf synth ──                             │
+│                                                                 │
+│    a) Comment out AzurermBackend + Backend_* variables         │
+│       in main.ts (so synth works without credentials)          │
+│                                                                 │
+│    b) Bash → cd <module> && cdktf synth                        │
+│                                                                 │
+│    c) If synth fails → read error → fix main.ts → re-run      │
+│                                                                 │
+│    d) Once synth passes → uncomment backend in main.ts         │
+│                                                                 │
+│    e) Final cdktf synth → generates cdk.tf.json with backend   │
+│                                                                 │
+│    f) Verify cdk.tf.json:                                      │
+│       ✔ Correct provider version                               │
+│       ✔ Backend config present                                  │
+│       ✔ No placeholder values                                   │
+│                                                                 │
+│  ── SUB-STEP 7: Print Summary ──                               │
 │                                                                 │
 │    Prints to GitHub Actions log:                               │
 │    - Version used + source (user or registry)                  │
 │    - Files changed                                              │
 │    - Exact changes made per file                               │
+│    - cdktf synth result (pass/fail)                            │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
                             ▼

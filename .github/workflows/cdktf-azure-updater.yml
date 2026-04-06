@@ -30,6 +30,16 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install CDKTF CLI
+        run: npm install -g cdktf-cli typescript ts-node
+
+      - name: Install module dependencies and generate provider bindings
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          npm install
+          cdktf get
+        continue-on-error: true
+
       - name: Run Claude Code — Update CDKTF Module
         uses: anthropics/claude-code-action@beta
         with:
@@ -88,11 +98,31 @@ jobs:
             In ${{ github.event.inputs.module_path }}/tsconfig.json:
             - Remove the line with "charset": "utf8"
 
-            STEP 6 — Show a clear summary
+            STEP 6 — Run cdktf synth to validate
+            Run the following commands inside ${{ github.event.inputs.module_path }}:
+
+            a) Comment out the backend section in main.ts (AzurermBackend block and
+               Backend_* TerraformVariable declarations) so cdktf synth works without credentials.
+
+            b) Run: cd ${{ github.event.inputs.module_path }} && cdktf synth
+
+            c) If synth fails, read the error, fix main.ts, and re-run until it passes.
+
+            d) Once synth passes, uncomment the backend section back in main.ts.
+
+            e) Run cdktf synth one final time to generate the final cdk.tf.json with backend.
+
+            f) Verify the generated cdk.tf.json has:
+               - Correct provider version
+               - Backend config present
+               - No placeholder values
+
+            STEP 7 — Show a clear summary
             Print a summary showing:
             - Provider version used (and whether it was user-provided or fetched from registry)
             - What files were changed
             - What specific changes were made in each file
+            - Whether cdktf synth passed or failed and why
 
       - name: Show git diff
         run: git diff
@@ -121,7 +151,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${version}`,
-              body: `## Automated CDKTF Module Update\n\n**Module:** \`${{ github.event.inputs.module_path }}\`\n**Provider version:** azurerm \`${version}\`\n**Version source:** ${version === 'latest' ? 'Fetched automatically from Terraform Registry via MCP' : 'User specified'}\n\n### Changes made by Claude Code\n- Updated \`cdktf.json\` provider version\n- Fixed \`main.ts\` imports to use \`.gen/\` sub-paths\n- Fixed deprecated arguments based on Terraform Registry provider details\n- Removed deprecated \`charset\` from \`tsconfig.json\`\n\n> Generated automatically by [Claude Code](https://claude.ai/code) using Terraform Registry MCP`,
+              body: `## Automated CDKTF Module Update\n\n**Module:** \`${{ github.event.inputs.module_path }}\`\n**Provider version:** azurerm \`${version}\`\n**Version source:** ${version === 'latest' ? 'Fetched automatically from Terraform Registry via MCP' : 'User specified'}\n\n### Changes made by Claude Code\n- Updated \`cdktf.json\` provider version\n- Fixed \`main.ts\` imports to use \`.gen/\` sub-paths\n- Fixed deprecated arguments based on Terraform Registry provider details\n- Removed deprecated \`charset\` from \`tsconfig.json\`\n- Ran \`cdktf synth\` to validate the generated \`cdk.tf.json\`\n\n> Generated automatically by [Claude Code](https://claude.ai/code) using Terraform Registry MCP`,
               head: '${{ steps.commit.outputs.branch }}',
               base: 'master'
             });
