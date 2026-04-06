@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "Pipeline",
+  "description": "Claude Code plugins for automating ICA (iCloudAccelerator) CDKTF Azure infrastructure workflows",
+  "owner": {
+    "name": "Vshwas",
+    "url": "https://github.com/Vshwas"
+  },
+  "plugins": [
+    {
+      "name": "cdktf-azure-updater",
+      "description": "Automates the full CDKTF Azure module update workflow: provider version bump, npm install, import fixes, cdktf synth, and terraform plan",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/Vshwas/Pipeline"
+    }
+  ]
+}
