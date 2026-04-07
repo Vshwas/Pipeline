@@ -1,0 +1,137 @@
+{
+  "//": {
+    "metadata": {
+      "backend": "azurerm",
+      "stackName": "17_Azure_ACR",
+      "version": "0.20.12"
+    },
+    "outputs": {
+    }
+  },
+  "locals": {
+    "common_tags": {
+      "Environment": "${var.Environment}",
+      "Project_Name": "${var.Project_Name}",
+      "Purpose": "${var.Purpose}"
+    }
+  },
+  "provider": {
+    "azurerm": [
+      {
+        "client_id": "${var.Client_Id}",
+        "client_secret": "${var.Client_Secret}",
+        "features": [
+          {
+          }
+        ],
+        "subscription_id": "${var.Subscription_Id}",
+        "tenant_id": "${var.Tenant_Id}"
+      }
+    ]
+  },
+  "resource": {
+    "azurerm_container_registry": {
+      "AzureContainerRegistry": {
+        "//": {
+          "metadata": {
+            "path": "17_Azure_ACR/AzureContainerRegistry",
+            "uniqueId": "AzureContainerRegistry"
+          }
+        },
+        "admin_enabled": "${var.Admin_Enabled}",
+        "location": "${var.Location}",
+        "name": "${var.Container_Name}",
+        "resource_group_name": "${var.Resource_Group_Name}",
+        "sku": "${var.SKU}",
+        "tags": "${local.common_tags}"
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "azurerm": {
+        "client_id": "${var.Client_Id}",
+        "client_secret": "${var.Client_Secret}",
+        "container_name": "${var.Backend_Container_Name}",
+        "key": "${var.Backend_Key}",
+        "resource_group_name": "${var.Backend_Resource_Group_Name}",
+        "storage_account_name": "${var.Backend_Storage_Account_Name}",
+        "subscription_id": "${var.Subscription_Id}",
+        "tenant_id": "${var.Tenant_Id}"
+      }
+    },
+    "required_providers": {
+      "azurerm": {
+        "source": "registry.terraform.io/hashicorp/azurerm",
+        "version": "4.64.0"
+      }
+    }
+  },
+  "variable": {
+    "Admin_Enabled": {
+      "default": false,
+      "description": " Optional$Specifies whether the admin user is enabled. Defaults to false.**Valid Inputs:true or false, Example:false",
+      "type": "bool"
+    },
+    "Backend_Container_Name": {
+      "description": " Required$Container name for  backend",
+      "type": "string"
+    },
+    "Backend_Key": {
+      "description": " Required$Key Name for azurerm backend",
+      "type": "string"
+    },
+    "Backend_Resource_Group_Name": {
+      "description": " Required$Resource Group name for azurerm backend",
+      "type": "string"
+    },
+    "Backend_Storage_Account_Name": {
+      "description": " Required$Storage AccountName name for backend",
+      "type": "string"
+    },
+    "Client_Id": {
+      "description": " Required$Azure clientId ",
+      "type": "string"
+    },
+    "Client_Secret": {
+      "description": " Required$Azure client Secret ID",
+      "type": "string"
+    },
+    "Container_Name": {
+      "description": " Required$The  name of the container registry.**Casing:Case insensitive, Valid Characters:Alphanumerics, Length:5-50, Example:icaACR01",
+      "type": "string"
+    },
+    "Environment": {
+      "description": " Required$Resource group environment name required here**Casing:Case insensitive, Valid Characters:Alphanumerics,Length:1-256, Example:Development",
+      "type": "string"
+    },
+    "Location": {
+      "description": "Required$Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created.**Casing:Lower case, Valid Characters:Location name without spaces, Example:centralindia",
+      "type": "string"
+    },
+    "Project_Name": {
+      "description": " Required$Project Name required here **Casing:Case insensitive, Valid Characters:Alphanumerics,Length:1-256, Example:ICloudAccelarator",
+      "type": "string"
+    },
+    "Purpose": {
+      "description": " Required$Purpose of the resource required here **Casing:Case insensitive, Valid Characters:Alphanumerics,Length:1-256, Example:ICAProject",
+      "type": "string"
+    },
+    "Resource_Group_Name": {
+      "description": "Required$Resource group name required here**Casing:Case insensitive, Valid Characters:Alphanumerics, underscores, parenthesis, hyphens, periods, Length:1-90, Example:ICA-Project01",
+      "type": "string"
+    },
+    "SKU": {
+      "description": " Required$The SKU name of the container registry.**Valid Inputs: Basic, Standard and Premium, Example:Standard",
+      "type": "string"
+    },
+    "Subscription_Id": {
+      "description": " Required$Azure Subscription ID",
+      "type": "string"
+    },
+    "Tenant_Id": {
+      "description": " Required$Azure tenant ID",
+      "type": "string"
+    }
+  }
+}
