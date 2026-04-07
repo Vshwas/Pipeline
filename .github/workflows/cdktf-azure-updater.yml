@@ -187,7 +187,16 @@ jobs:
           git config user.name "Claude Code Bot"
           git config user.email "claude-code-bot@github-actions"
           git checkout -b $BRANCH
-          git add ${{ github.event.inputs.module_path }}/
+          MODULE="${{ github.event.inputs.module_path }}"
+          CDK_JSON=$(find "$MODULE/cdktf.out/stacks" -name "cdk.tf.json" | head -1)
+          git add "$MODULE/main.ts" \
+                  "$MODULE/cdktf.json" \
+                  "$MODULE/tsconfig.json" \
+                  "$MODULE/package.json" \
+                  "$MODULE/variables.tf" \
+                  "$MODULE/var.tfvars" \
+                  "$MODULE/.gitignore" \
+                  "$CDK_JSON" 2>/dev/null || true
           git diff --cached --quiet || git commit -m "chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${VERSION} via Claude Code"
           git push origin $BRANCH
 
