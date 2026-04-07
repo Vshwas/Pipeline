@@ -117,27 +117,57 @@ jobs:
       - name: Run cdktf synth to generate cdk.tf.json
         working-directory: ${{ github.event.inputs.module_path }}
         run: |
-          echo "==> Commenting out backend for synth without credentials..."
-          sed -i 's/^\(.*new AzurermBackend\)/\/\/ \1/' main.ts
-          sed -i 's/^\(.*Backend_\)/\/\/ \1/' main.ts
-
           echo "==> Running cdktf synth..."
           cdktf synth
 
-          echo "==> Restoring backend..."
-          sed -i 's|^// \(.*new AzurermBackend\)|\1|' main.ts
-          sed -i 's|^// \(.*Backend_\)|\1|' main.ts
-
-          echo "==> Running final cdktf synth with backend..."
-          cdktf synth
-
           echo "==> Verifying cdk.tf.json..."
-          if [ ! -f cdktf.out/stacks/*/cdk.tf.json ]; then
+          CDK_JSON=$(find cdktf.out/stacks -name "cdk.tf.json" | head -1)
+          if [ -z "$CDK_JSON" ]; then
             echo "ERROR: cdk.tf.json not found!"
             exit 1
           fi
-          echo "cdk.tf.json generated successfully."
-          cat cdktf.out/stacks/*/cdk.tf.json | python3 -m json.tool --no-ensure-ascii > /dev/null && echo "Valid JSON confirmed."
+          echo "cdk.tf.json found at: $CDK_JSON"
+          python3 -m json.tool "$CDK_JSON" > /dev/null && echo "Valid JSON confirmed."
+
+      - name: Generate variables.tf from cdk.tf.json
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          CDK_JSON=$(find cdktf.out/stacks -name "cdk.tf.json" | head -1)
+          echo "==> Generating variables.tf from $CDK_JSON..."
+
+          python3 -c "
+import json
+
+with open('$CDK_JSON') as f:
+    data = json.load(f)
+
+variables = data.get('variable', {})
+lines = []
+for name, attrs in variables.items():
+    lines.append('variable \"' + name + '\" {')
+    vtype = attrs.get('type', 'string')
+    lines.append('  type        = ' + str(vtype))
+    desc = attrs.get('description', '').replace('\"', '\\\\\"')
+    if desc:
+        lines.append('  description = \"' + desc + '\"')
+    if 'default' in attrs:
+        default = attrs['default']
+        if isinstance(default, bool):
+            lines.append('  default     = ' + ('true' if default else 'false'))
+        elif isinstance(default, str):
+            lines.append('  default     = \"' + default + '\"')
+        else:
+            lines.append('  default     = ' + str(default))
+    lines.append('}')
+    lines.append('')
+
+with open('variables.tf', 'w') as f:
+    f.write('\n'.join(lines))
+
+print(f'Generated variables.tf with {len(variables)} variables.')
+"
+          echo "==> variables.tf contents:"
+          cat variables.tf
 
       - name: Show git diff
         run: git diff
