@@ -1,5 +1,4 @@
 cdktf.out/
-!cdktf.out/**/cdk.tf.json
 .gen/
 node_modules/
 .terraform/

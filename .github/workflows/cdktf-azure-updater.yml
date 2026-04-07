@@ -195,8 +195,8 @@ jobs:
                   "$MODULE/package.json" \
                   "$MODULE/variables.tf" \
                   "$MODULE/var.tfvars" \
-                  "$MODULE/.gitignore" \
-                  "$CDK_JSON" 2>/dev/null || true
+                  "$MODULE/.gitignore" 2>/dev/null || true
+          git add -f "$CDK_JSON"
           git diff --cached --quiet || git commit -m "chore: upgrade ${{ github.event.inputs.module_path }} to azurerm ${VERSION} via Claude Code"
           git push origin $BRANCH
 
