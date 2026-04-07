@@ -1,6 +1,7 @@
 import { Construct } from "constructs";
 import { App, AzurermBackend, TerraformLocal, TerraformStack, TerraformVariable } from "cdktf";
-import { AzurermProvider,ContainerRegistry } from "@cdktf/provider-azurerm";
+import { AzurermProvider } from "./.gen/providers/azurerm/provider";
+import { ContainerRegistry } from "./.gen/providers/azurerm/container-registry";
 
 
 class MyStack extends TerraformStack {
@@ -84,7 +85,7 @@ class MyStack extends TerraformStack {
     tenantId:Tenant_Id.value,
     clientId:Client_Id.value,
     clientSecret:Client_Secret.value,
-      features: { },
+      features: [{}],
     })
 
     new AzurermBackend(this, {
@@ -127,11 +128,6 @@ class MyStack extends TerraformStack {
        type:"number",
       description:" Optional$The number of days to retain an untagged manifest after which it gets purged. Default is 7.**Valid Characters:Number, Example:7"
     });
-        const Retention_Policy_Enabled=new TerraformVariable(this, "Retention_Policy_Enabled",
-    {default:false,
-       type:"bool",
-      description:" Optional$Boolean value that indicates whether the policy is enabled.**Valid Inputs:true or false, Example:false"
-    });
 
 
  new ContainerRegistry(this,"AzureContainerRegistry",{
@@ -142,11 +138,8 @@ class MyStack extends TerraformStack {
       sku:SKU.value,
       adminEnabled:Admin_Enabled.value,
       publicNetworkAccessEnabled:Public_Network_Access_Enabled.value,
-zoneRedundancyEnabled:Zone_Redundancy_Enabled.value,
-    retentionPolicy:[{
-      days:Retention_Policy_Days.value,
-      enabled:Retention_Policy_Enabled.value,
-    }]
+      zoneRedundancyEnabled:Zone_Redundancy_Enabled.value,
+      retentionPolicyInDays:Retention_Policy_Days.value
     })
 
   }

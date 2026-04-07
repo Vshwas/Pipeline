@@ -1,0 +1,16 @@
+{
+  "stacks": {
+    "17_Azure_ACR": {
+      "annotations": [
+      ],
+      "constructPath": "17_Azure_ACR",
+      "dependencies": [
+      ],
+      "name": "17_Azure_ACR",
+      "stackMetadataPath": "stacks/17_Azure_ACR/metadata.json",
+      "synthesizedStackPath": "stacks/17_Azure_ACR/cdk.tf.json",
+      "workingDirectory": "stacks/17_Azure_ACR"
+    }
+  },
+  "version": "0.20.12"
+}
