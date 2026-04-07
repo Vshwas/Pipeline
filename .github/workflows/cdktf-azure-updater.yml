@@ -96,15 +96,22 @@ jobs:
                 ContainerRegistry → import from "./.gen/providers/azurerm/container-registry"
             - The cdktf and constructs imports stay unchanged.
 
-            STEP 4 — Fix deprecated arguments
-            In ${{ github.event.inputs.module_path }}/main.ts:
-            - Replace  retentionPolicy:[{ days: X, enabled: Y }]  with  retentionPolicyInDays: X
-            - Remove the Retention_Policy_Enabled TerraformVariable declaration AND its usage (no longer supported)
-            - Keep  features: {}  as an object — do NOT change it to an array [{}]
-            - Remove publicNetworkAccessEnabled from ContainerRegistry AND remove its TerraformVariable declaration (Public_Network_Access_Enabled) — this property does not exist in azurerm 4.x ContainerRegistryConfig
-            - Remove zoneRedundancyEnabled from ContainerRegistry AND remove its TerraformVariable declaration (Zone_Redundancy_Enabled) — this property does not exist in azurerm 4.x ContainerRegistryConfig
-            - IMPORTANT: For every property you remove from a resource block, also remove its corresponding TerraformVariable declaration if that variable is no longer used anywhere in the file.
-            - Read the generated types file at ./.gen/providers/azurerm/container-registry/index.ts to get the exact list of valid properties for ContainerRegistryConfig, and ensure main.ts only uses properties that exist there.
+            STEP 4 — Fix deprecated arguments using actual generated types
+            DO NOT guess property names. Follow these steps exactly:
+
+            a) Read the file: ${{ github.event.inputs.module_path }}/.gen/providers/azurerm/container-registry/index.ts
+               Extract every property name defined in the ContainerRegistryConfig interface.
+               This is the ONLY valid list of properties for ContainerRegistry.
+
+            b) Read ${{ github.event.inputs.module_path }}/main.ts and find the ContainerRegistry block.
+               For EACH property currently in the ContainerRegistry block:
+               - If the property EXISTS in ContainerRegistryConfig → keep it
+               - If the property does NOT EXIST in ContainerRegistryConfig → remove it from the block
+                 AND remove the corresponding TerraformVariable declaration if that variable is now unused
+
+            c) Keep  features: {}  as an object — do NOT change it to an array [{}]
+
+            d) After editing, list every property you removed and every TerraformVariable you removed.
 
             STEP 5 — Fix tsconfig.json
             In ${{ github.event.inputs.module_path }}/tsconfig.json:
