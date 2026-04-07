@@ -109,7 +109,7 @@ jobs:
                - If the property does NOT EXIST in ContainerRegistryConfig → remove it from the block
                  AND remove the corresponding TerraformVariable declaration if that variable is now unused
 
-            c) Keep  features: {}  as an object — do NOT change it to an array [{}]
+            c) Set  features: [{}] as any  — azurerm 4.x CDKTF types expect AzurermProviderFeatures[] and the cast avoids strict TS errors
 
             d) After editing, list every property you removed and every TerraformVariable you removed.
 
