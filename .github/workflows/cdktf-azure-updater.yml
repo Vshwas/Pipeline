@@ -134,39 +134,7 @@ jobs:
         run: |
           CDK_JSON=$(find cdktf.out/stacks -name "cdk.tf.json" | head -1)
           echo "==> Generating variables.tf from $CDK_JSON..."
-
-          python3 << PYEOF
-import json
-
-with open("$CDK_JSON") as f:
-    data = json.load(f)
-
-variables = data.get("variable", {})
-lines = []
-for name, attrs in variables.items():
-    lines.append('variable "' + name + '" {')
-    vtype = attrs.get("type", "string")
-    lines.append("  type        = " + str(vtype))
-    desc = attrs.get("description", "").replace('"', '\\"')
-    if desc:
-        lines.append('  description = "' + desc + '"')
-    if "default" in attrs:
-        default = attrs["default"]
-        if isinstance(default, bool):
-            lines.append("  default     = " + ("true" if default else "false"))
-        elif isinstance(default, str):
-            lines.append('  default     = "' + default + '"')
-        else:
-            lines.append("  default     = " + str(default))
-    lines.append("}")
-    lines.append("")
-
-with open("variables.tf", "w") as f:
-    f.write("\n".join(lines))
-
-print("Generated variables.tf with " + str(len(variables)) + " variables.")
-PYEOF
-
+          python3 $GITHUB_WORKSPACE/scripts/generate_variables_tf.py "$CDK_JSON"
           echo "==> variables.tf contents:"
           cat variables.tf
 
