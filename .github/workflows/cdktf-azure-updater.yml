@@ -48,7 +48,7 @@ jobs:
       - name: Run Claude Code — Update CDKTF Module
         uses: anthropics/claude-code-action@beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           mode: agent
           allowed_tools: "Bash,Read,Write,Edit,Glob,Grep,mcp__terraform__get_latest_provider_version,mcp__terraform__get_provider_details,mcp__terraform__get_provider_capabilities"
