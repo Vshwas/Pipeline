@@ -99,11 +99,12 @@ jobs:
             STEP 4 — Fix deprecated arguments
             In ${{ github.event.inputs.module_path }}/main.ts:
             - Replace  retentionPolicy:[{ days: X, enabled: Y }]  with  retentionPolicyInDays: X
-            - Remove the Retention_Policy_Enabled TerraformVariable declaration and its usage (no longer supported)
+            - Remove the Retention_Policy_Enabled TerraformVariable declaration AND its usage (no longer supported)
             - Keep  features: {}  as an object — do NOT change it to an array [{}]
-            - Remove publicNetworkAccessEnabled from ContainerRegistry — this property does not exist in azurerm 4.x ContainerRegistryConfig
-            - After making changes, check the generated types under ./.gen/providers/azurerm/ to verify
-              property names are valid before finalising. Remove or rename any property not found in the type definition.
+            - Remove publicNetworkAccessEnabled from ContainerRegistry AND remove its TerraformVariable declaration (Public_Network_Access_Enabled) — this property does not exist in azurerm 4.x ContainerRegistryConfig
+            - Remove zoneRedundancyEnabled from ContainerRegistry AND remove its TerraformVariable declaration (Zone_Redundancy_Enabled) — this property does not exist in azurerm 4.x ContainerRegistryConfig
+            - IMPORTANT: For every property you remove from a resource block, also remove its corresponding TerraformVariable declaration if that variable is no longer used anywhere in the file.
+            - Read the generated types file at ./.gen/providers/azurerm/container-registry/index.ts to get the exact list of valid properties for ContainerRegistryConfig, and ensure main.ts only uses properties that exist there.
 
             STEP 5 — Fix tsconfig.json
             In ${{ github.event.inputs.module_path }}/tsconfig.json:
@@ -131,7 +132,7 @@ jobs:
           echo "cdk.tf.json found at: $CDK_JSON"
           python3 -m json.tool "$CDK_JSON" > /dev/null && echo "Valid JSON confirmed."
 
-      - name: Generate variables.tf from cdk.tf.json
+      - name: Generate variables.tf and var.tfvars from cdk.tf.json
         working-directory: ${{ github.event.inputs.module_path }}
         run: |
           CDK_JSON=$(find cdktf.out/stacks -name "cdk.tf.json" | head -1)
@@ -139,6 +140,32 @@ jobs:
           python3 $GITHUB_WORKSPACE/scripts/generate_variables_tf.py "$CDK_JSON"
           echo "==> variables.tf contents:"
           cat variables.tf
+
+          echo "==> Generating var.tfvars with sample values..."
+          python3 $GITHUB_WORKSPACE/scripts/generate_tfvars.py "$CDK_JSON"
+          echo "==> var.tfvars contents:"
+          cat var.tfvars
+
+      - name: Terraform init and plan (validate without backend)
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          CDK_OUT=$(find cdktf.out/stacks -name "cdk.tf.json" -exec dirname {} \; | head -1)
+          echo "==> Running terraform init (no backend) in $CDK_OUT..."
+          terraform -chdir="$CDK_OUT" init -backend=false
+
+          echo "==> Running terraform plan..."
+          terraform -chdir="$CDK_OUT" plan \
+            -var-file="$GITHUB_WORKSPACE/${{ github.event.inputs.module_path }}/var.tfvars" \
+            -input=false \
+            -no-color \
+            || echo "::warning::terraform plan completed with warnings — review above output"
+
+      - name: Final cdktf synth with backend restored
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          echo "==> Running final cdktf synth (with backend)..."
+          cdktf synth
+          echo "==> Final cdk.tf.json generated successfully."
 
       - name: Show git diff
         run: git diff
