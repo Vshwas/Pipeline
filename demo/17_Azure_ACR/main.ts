@@ -1,6 +1,7 @@
 import { Construct } from "constructs";
 import { App, AzurermBackend, TerraformLocal, TerraformStack, TerraformVariable } from "cdktf";
-import { AzurermProvider,ContainerRegistry } from "@cdktf/provider-azurerm";
+import { AzurermProvider } from "./.gen/providers/azurerm/provider";
+import { ContainerRegistry } from "./.gen/providers/azurerm/container-registry";
 
 
 class MyStack extends TerraformStack {
@@ -112,26 +113,6 @@ class MyStack extends TerraformStack {
        type:"bool",
       description:" Optional$Specifies whether the admin user is enabled. Defaults to false.**Valid Inputs:true or false, Example:false"
     });
-      const Public_Network_Access_Enabled=new TerraformVariable(this, "Public_Network_Access_Enabled",
-    {default:true,
-       type:"bool",
-      description:"Optional$Whether public network access is allowed for the container registry. Defaults to true.**Valid Inputs:true or false, Example:true"
-    });
-      const Zone_Redundancy_Enabled=new TerraformVariable(this, "Zone_Redundancy_Enabled",
-    {default:false,
-       type:"bool",
-      description:"Optional$Whether zone redundancy is enabled for this Container Registry? Changing this forces a new resource to be created. Defaults to false.**Valid Inputs:true or false, Example:false"
-    });
-     const Retention_Policy_Days=new TerraformVariable(this, "Retention_Policy_Days",
-    {default:7,
-       type:"number",
-      description:" Optional$The number of days to retain an untagged manifest after which it gets purged. Default is 7.**Valid Characters:Number, Example:7"
-    });
-        const Retention_Policy_Enabled=new TerraformVariable(this, "Retention_Policy_Enabled",
-    {default:false,
-       type:"bool",
-      description:" Optional$Boolean value that indicates whether the policy is enabled.**Valid Inputs:true or false, Example:false"
-    });
 
 
  new ContainerRegistry(this,"AzureContainerRegistry",{
@@ -141,12 +122,6 @@ class MyStack extends TerraformStack {
       tags:commonTags.expression,
       sku:SKU.value,
       adminEnabled:Admin_Enabled.value,
-      publicNetworkAccessEnabled:Public_Network_Access_Enabled.value,
-zoneRedundancyEnabled:Zone_Redundancy_Enabled.value,
-    retentionPolicy:[{
-      days:Retention_Policy_Days.value,
-      enabled:Retention_Policy_Enabled.value,
-    }]
     })
 
   }
