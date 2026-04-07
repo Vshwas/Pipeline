@@ -11,6 +11,10 @@ on:
         description: 'Target azurerm provider version (leave empty to fetch latest from Terraform Registry)'
         required: false
         default: ''
+      release_tag:
+        description: 'Git tag for this release (e.g. v1, v2, v3 — leave empty to skip tagging)'
+        required: false
+        default: ''
 
 jobs:
   update-module:
@@ -103,31 +107,37 @@ jobs:
             In ${{ github.event.inputs.module_path }}/tsconfig.json:
             - Remove the line with "charset": "utf8"
 
-            STEP 6 — Run cdktf synth to validate
-            Run the following commands inside ${{ github.event.inputs.module_path }}:
-
-            a) Comment out the backend section in main.ts (AzurermBackend block and
-               Backend_* TerraformVariable declarations) so cdktf synth works without credentials.
-
-            b) Run: cd ${{ github.event.inputs.module_path }} && cdktf synth
-
-            c) If synth fails, read the error, fix main.ts, and re-run until it passes.
-
-            d) Once synth passes, uncomment the backend section back in main.ts.
-
-            e) Run cdktf synth one final time to generate the final cdk.tf.json with backend.
-
-            f) Verify the generated cdk.tf.json has:
-               - Correct provider version
-               - Backend config present
-               - No placeholder values
-
-            STEP 7 — Show a clear summary
+            STEP 6 — Show a clear summary
             Print a summary showing:
             - Provider version used (and whether it was user-provided or fetched from registry)
             - What files were changed
             - What specific changes were made in each file
             - Whether cdktf synth passed or failed and why
+
+      - name: Run cdktf synth to generate cdk.tf.json
+        working-directory: ${{ github.event.inputs.module_path }}
+        run: |
+          echo "==> Commenting out backend for synth without credentials..."
+          sed -i 's/^\(.*new AzurermBackend\)/\/\/ \1/' main.ts
+          sed -i 's/^\(.*Backend_\)/\/\/ \1/' main.ts
+
+          echo "==> Running cdktf synth..."
+          cdktf synth
+
+          echo "==> Restoring backend..."
+          sed -i 's|^// \(.*new AzurermBackend\)|\1|' main.ts
+          sed -i 's|^// \(.*Backend_\)|\1|' main.ts
+
+          echo "==> Running final cdktf synth with backend..."
+          cdktf synth
+
+          echo "==> Verifying cdk.tf.json..."
+          if [ ! -f cdktf.out/stacks/*/cdk.tf.json ]; then
+            echo "ERROR: cdk.tf.json not found!"
+            exit 1
+          fi
+          echo "cdk.tf.json generated successfully."
+          cat cdktf.out/stacks/*/cdk.tf.json | python3 -m json.tool --no-ensure-ascii > /dev/null && echo "Valid JSON confirmed."
 
       - name: Show git diff
         run: git diff
@@ -161,3 +171,23 @@ jobs:
               base: 'master'
             });
             console.log('PR created: ' + pr.html_url);
+
+      - name: Create release tag
+        if: ${{ github.event.inputs.release_tag != '' }}
+        run: |
+          TAG="${{ github.event.inputs.release_tag }}"
+          VERSION="${{ github.event.inputs.provider_version }}"
+          if [ -z "$VERSION" ]; then VERSION="latest"; fi
+
+          git config user.name "Claude Code Bot"
+          git config user.email "claude-code-bot@github-actions"
+
+          # Delete tag if it already exists (allows re-tagging)
+          git tag -d "$TAG" 2>/dev/null || true
+          git push origin ":refs/tags/$TAG" 2>/dev/null || true
+
+          # Create annotated tag on master
+          git tag -a "$TAG" -m "Release $TAG — azurerm $VERSION (${{ github.event.inputs.module_path }})"
+          git push origin "$TAG"
+
+          echo "Tag $TAG created and pushed."
