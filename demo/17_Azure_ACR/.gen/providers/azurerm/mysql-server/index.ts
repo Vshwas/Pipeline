@@ -1,0 +1,779 @@
+// https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server
+// generated from terraform resource schema
+
+import { Construct } from 'constructs';
+import * as cdktf from 'cdktf';
+
+// Configuration
+
+export interface MysqlServerConfig extends cdktf.TerraformMetaArguments {
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#administrator_login MysqlServer#administrator_login}
+  */
+  readonly administratorLogin: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#administrator_login_password MysqlServer#administrator_login_password}
+  */
+  readonly administratorLoginPassword: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#id MysqlServer#id}
+  *
+  * Please be aware that the id field is automatically added to all resources in Terraform providers using a Terraform provider SDK version below 2.
+  * If you experience problems setting this value it might not be settable. Please take a look at the provider documentation to ensure it should be settable.
+  */
+  readonly id?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#location MysqlServer#location}
+  */
+  readonly location: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#name MysqlServer#name}
+  */
+  readonly name: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#resource_group_name MysqlServer#resource_group_name}
+  */
+  readonly resourceGroupName: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#sku_name MysqlServer#sku_name}
+  */
+  readonly skuName: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#ssl_enforcement MysqlServer#ssl_enforcement}
+  */
+  readonly sslEnforcement: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#tags MysqlServer#tags}
+  */
+  readonly tags?: { [key: string]: string };
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#version MysqlServer#version}
+  */
+  readonly version: string;
+  /**
+  * storage_profile block
+  *
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#storage_profile MysqlServer#storage_profile}
+  */
+  readonly storageProfile: MysqlServerStorageProfile;
+  /**
+  * timeouts block
+  *
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#timeouts MysqlServer#timeouts}
+  */
+  readonly timeouts?: MysqlServerTimeouts;
+}
+export interface MysqlServerStorageProfile {
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#auto_grow MysqlServer#auto_grow}
+  */
+  readonly autoGrow?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#backup_retention_days MysqlServer#backup_retention_days}
+  */
+  readonly backupRetentionDays?: number;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#geo_redundant_backup MysqlServer#geo_redundant_backup}
+  */
+  readonly geoRedundantBackup?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#storage_mb MysqlServer#storage_mb}
+  */
+  readonly storageMb: number;
+}
+
+export function mysqlServerStorageProfileToTerraform(struct?: MysqlServerStorageProfileOutputReference | MysqlServerStorageProfile): any {
+  if (!cdktf.canInspect(struct) || cdktf.Tokenization.isResolvable(struct)) { return struct; }
+  if (cdktf.isComplexElement(struct)) {
+    throw new Error("A complex element was used as configuration, this is not supported: https://cdk.tf/complex-object-as-configuration");
+  }
+  return {
+    auto_grow: cdktf.stringToTerraform(struct!.autoGrow),
+    backup_retention_days: cdktf.numberToTerraform(struct!.backupRetentionDays),
+    geo_redundant_backup: cdktf.stringToTerraform(struct!.geoRedundantBackup),
+    storage_mb: cdktf.numberToTerraform(struct!.storageMb),
+  }
+}
+
+
+export function mysqlServerStorageProfileToHclTerraform(struct?: MysqlServerStorageProfileOutputReference | MysqlServerStorageProfile): any {
+  if (!cdktf.canInspect(struct) || cdktf.Tokenization.isResolvable(struct)) { return struct; }
+  if (cdktf.isComplexElement(struct)) {
+    throw new Error("A complex element was used as configuration, this is not supported: https://cdk.tf/complex-object-as-configuration");
+  }
+  const attrs = {
+    auto_grow: {
+      value: cdktf.stringToHclTerraform(struct!.autoGrow),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+    backup_retention_days: {
+      value: cdktf.numberToHclTerraform(struct!.backupRetentionDays),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "number",
+    },
+    geo_redundant_backup: {
+      value: cdktf.stringToHclTerraform(struct!.geoRedundantBackup),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+    storage_mb: {
+      value: cdktf.numberToHclTerraform(struct!.storageMb),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "number",
+    },
+  };
+
+  // remove undefined attributes
+  return Object.fromEntries(Object.entries(attrs).filter(([_, value]) => value !== undefined && value.value !== undefined));
+}
+
+export class MysqlServerStorageProfileOutputReference extends cdktf.ComplexObject {
+  private isEmptyObject = false;
+
+  /**
+  * @param terraformResource The parent resource
+  * @param terraformAttribute The attribute on the parent resource this class is referencing
+  */
+  public constructor(terraformResource: cdktf.IInterpolatingParent, terraformAttribute: string) {
+    super(terraformResource, terraformAttribute, false, 0);
+  }
+
+  public get internalValue(): MysqlServerStorageProfile | undefined {
+    let hasAnyValues = this.isEmptyObject;
+    const internalValueResult: any = {};
+    if (this._autoGrow !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.autoGrow = this._autoGrow;
+    }
+    if (this._backupRetentionDays !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.backupRetentionDays = this._backupRetentionDays;
+    }
+    if (this._geoRedundantBackup !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.geoRedundantBackup = this._geoRedundantBackup;
+    }
+    if (this._storageMb !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.storageMb = this._storageMb;
+    }
+    return hasAnyValues ? internalValueResult : undefined;
+  }
+
+  public set internalValue(value: MysqlServerStorageProfile | undefined) {
+    if (value === undefined) {
+      this.isEmptyObject = false;
+      this._autoGrow = undefined;
+      this._backupRetentionDays = undefined;
+      this._geoRedundantBackup = undefined;
+      this._storageMb = undefined;
+    }
+    else {
+      this.isEmptyObject = Object.keys(value).length === 0;
+      this._autoGrow = value.autoGrow;
+      this._backupRetentionDays = value.backupRetentionDays;
+      this._geoRedundantBackup = value.geoRedundantBackup;
+      this._storageMb = value.storageMb;
+    }
+  }
+
+  // auto_grow - computed: false, optional: true, required: false
+  private _autoGrow?: string; 
+  public get autoGrow() {
+    return this.getStringAttribute('auto_grow');
+  }
+  public set autoGrow(value: string) {
+    this._autoGrow = value;
+  }
+  public resetAutoGrow() {
+    this._autoGrow = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get autoGrowInput() {
+    return this._autoGrow;
+  }
+
+  // backup_retention_days - computed: false, optional: true, required: false
+  private _backupRetentionDays?: number; 
+  public get backupRetentionDays() {
+    return this.getNumberAttribute('backup_retention_days');
+  }
+  public set backupRetentionDays(value: number) {
+    this._backupRetentionDays = value;
+  }
+  public resetBackupRetentionDays() {
+    this._backupRetentionDays = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get backupRetentionDaysInput() {
+    return this._backupRetentionDays;
+  }
+
+  // geo_redundant_backup - computed: false, optional: true, required: false
+  private _geoRedundantBackup?: string; 
+  public get geoRedundantBackup() {
+    return this.getStringAttribute('geo_redundant_backup');
+  }
+  public set geoRedundantBackup(value: string) {
+    this._geoRedundantBackup = value;
+  }
+  public resetGeoRedundantBackup() {
+    this._geoRedundantBackup = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get geoRedundantBackupInput() {
+    return this._geoRedundantBackup;
+  }
+
+  // storage_mb - computed: false, optional: false, required: true
+  private _storageMb?: number; 
+  public get storageMb() {
+    return this.getNumberAttribute('storage_mb');
+  }
+  public set storageMb(value: number) {
+    this._storageMb = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get storageMbInput() {
+    return this._storageMb;
+  }
+}
+export interface MysqlServerTimeouts {
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#create MysqlServer#create}
+  */
+  readonly create?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#delete MysqlServer#delete}
+  */
+  readonly delete?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#read MysqlServer#read}
+  */
+  readonly read?: string;
+  /**
+  * Docs at Terraform Registry: {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#update MysqlServer#update}
+  */
+  readonly update?: string;
+}
+
+export function mysqlServerTimeoutsToTerraform(struct?: MysqlServerTimeouts | cdktf.IResolvable): any {
+  if (!cdktf.canInspect(struct) || cdktf.Tokenization.isResolvable(struct)) { return struct; }
+  if (cdktf.isComplexElement(struct)) {
+    throw new Error("A complex element was used as configuration, this is not supported: https://cdk.tf/complex-object-as-configuration");
+  }
+  return {
+    create: cdktf.stringToTerraform(struct!.create),
+    delete: cdktf.stringToTerraform(struct!.delete),
+    read: cdktf.stringToTerraform(struct!.read),
+    update: cdktf.stringToTerraform(struct!.update),
+  }
+}
+
+
+export function mysqlServerTimeoutsToHclTerraform(struct?: MysqlServerTimeouts | cdktf.IResolvable): any {
+  if (!cdktf.canInspect(struct) || cdktf.Tokenization.isResolvable(struct)) { return struct; }
+  if (cdktf.isComplexElement(struct)) {
+    throw new Error("A complex element was used as configuration, this is not supported: https://cdk.tf/complex-object-as-configuration");
+  }
+  const attrs = {
+    create: {
+      value: cdktf.stringToHclTerraform(struct!.create),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+    delete: {
+      value: cdktf.stringToHclTerraform(struct!.delete),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+    read: {
+      value: cdktf.stringToHclTerraform(struct!.read),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+    update: {
+      value: cdktf.stringToHclTerraform(struct!.update),
+      isBlock: false,
+      type: "simple",
+      storageClassType: "string",
+    },
+  };
+
+  // remove undefined attributes
+  return Object.fromEntries(Object.entries(attrs).filter(([_, value]) => value !== undefined && value.value !== undefined));
+}
+
+export class MysqlServerTimeoutsOutputReference extends cdktf.ComplexObject {
+  private isEmptyObject = false;
+  private resolvableValue?: cdktf.IResolvable;
+
+  /**
+  * @param terraformResource The parent resource
+  * @param terraformAttribute The attribute on the parent resource this class is referencing
+  */
+  public constructor(terraformResource: cdktf.IInterpolatingParent, terraformAttribute: string) {
+    super(terraformResource, terraformAttribute, false);
+  }
+
+  public get internalValue(): MysqlServerTimeouts | cdktf.IResolvable | undefined {
+    if (this.resolvableValue) {
+      return this.resolvableValue;
+    }
+    let hasAnyValues = this.isEmptyObject;
+    const internalValueResult: any = {};
+    if (this._create !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.create = this._create;
+    }
+    if (this._delete !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.delete = this._delete;
+    }
+    if (this._read !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.read = this._read;
+    }
+    if (this._update !== undefined) {
+      hasAnyValues = true;
+      internalValueResult.update = this._update;
+    }
+    return hasAnyValues ? internalValueResult : undefined;
+  }
+
+  public set internalValue(value: MysqlServerTimeouts | cdktf.IResolvable | undefined) {
+    if (value === undefined) {
+      this.isEmptyObject = false;
+      this.resolvableValue = undefined;
+      this._create = undefined;
+      this._delete = undefined;
+      this._read = undefined;
+      this._update = undefined;
+    }
+    else if (cdktf.Tokenization.isResolvable(value)) {
+      this.isEmptyObject = false;
+      this.resolvableValue = value;
+    }
+    else {
+      this.isEmptyObject = Object.keys(value).length === 0;
+      this.resolvableValue = undefined;
+      this._create = value.create;
+      this._delete = value.delete;
+      this._read = value.read;
+      this._update = value.update;
+    }
+  }
+
+  // create - computed: false, optional: true, required: false
+  private _create?: string; 
+  public get create() {
+    return this.getStringAttribute('create');
+  }
+  public set create(value: string) {
+    this._create = value;
+  }
+  public resetCreate() {
+    this._create = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get createInput() {
+    return this._create;
+  }
+
+  // delete - computed: false, optional: true, required: false
+  private _delete?: string; 
+  public get delete() {
+    return this.getStringAttribute('delete');
+  }
+  public set delete(value: string) {
+    this._delete = value;
+  }
+  public resetDelete() {
+    this._delete = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get deleteInput() {
+    return this._delete;
+  }
+
+  // read - computed: false, optional: true, required: false
+  private _read?: string; 
+  public get read() {
+    return this.getStringAttribute('read');
+  }
+  public set read(value: string) {
+    this._read = value;
+  }
+  public resetRead() {
+    this._read = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get readInput() {
+    return this._read;
+  }
+
+  // update - computed: false, optional: true, required: false
+  private _update?: string; 
+  public get update() {
+    return this.getStringAttribute('update');
+  }
+  public set update(value: string) {
+    this._update = value;
+  }
+  public resetUpdate() {
+    this._update = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get updateInput() {
+    return this._update;
+  }
+}
+
+/**
+* Represents a {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server azurerm_mysql_server}
+*/
+export class MysqlServer extends cdktf.TerraformResource {
+
+  // =================
+  // STATIC PROPERTIES
+  // =================
+  public static readonly tfResourceType = "azurerm_mysql_server";
+
+  // ==============
+  // STATIC Methods
+  // ==============
+  /**
+  * Generates CDKTF code for importing a MysqlServer resource upon running "cdktf plan <stack-name>"
+  * @param scope The scope in which to define this construct
+  * @param importToId The construct id used in the generated config for the MysqlServer to import
+  * @param importFromId The id of the existing MysqlServer that should be imported. Refer to the {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server#import import section} in the documentation of this resource for the id to use
+  * @param provider? Optional instance of the provider where the MysqlServer to import is found
+  */
+  public static generateConfigForImport(scope: Construct, importToId: string, importFromId: string, provider?: cdktf.TerraformProvider) {
+        return new cdktf.ImportableResource(scope, importToId, { terraformResourceType: "azurerm_mysql_server", importId: importFromId, provider });
+      }
+
+  // ===========
+  // INITIALIZER
+  // ===========
+
+  /**
+  * Create a new {@link https://registry.terraform.io/providers/hashicorp/azurerm/2.0.0/docs/resources/mysql_server azurerm_mysql_server} Resource
+  *
+  * @param scope The scope in which to define this construct
+  * @param id The scoped construct ID. Must be unique amongst siblings in the same scope
+  * @param options MysqlServerConfig
+  */
+  public constructor(scope: Construct, id: string, config: MysqlServerConfig) {
+    super(scope, id, {
+      terraformResourceType: 'azurerm_mysql_server',
+      terraformGeneratorMetadata: {
+        providerName: 'azurerm',
+        providerVersion: '2.0.0',
+        providerVersionConstraint: '~>2.0.0'
+      },
+      provider: config.provider,
+      dependsOn: config.dependsOn,
+      count: config.count,
+      lifecycle: config.lifecycle,
+      provisioners: config.provisioners,
+      connection: config.connection,
+      forEach: config.forEach
+    });
+    this._administratorLogin = config.administratorLogin;
+    this._administratorLoginPassword = config.administratorLoginPassword;
+    this._id = config.id;
+    this._location = config.location;
+    this._name = config.name;
+    this._resourceGroupName = config.resourceGroupName;
+    this._skuName = config.skuName;
+    this._sslEnforcement = config.sslEnforcement;
+    this._tags = config.tags;
+    this._version = config.version;
+    this._storageProfile.internalValue = config.storageProfile;
+    this._timeouts.internalValue = config.timeouts;
+  }
+
+  // ==========
+  // ATTRIBUTES
+  // ==========
+
+  // administrator_login - computed: false, optional: false, required: true
+  private _administratorLogin?: string; 
+  public get administratorLogin() {
+    return this.getStringAttribute('administrator_login');
+  }
+  public set administratorLogin(value: string) {
+    this._administratorLogin = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get administratorLoginInput() {
+    return this._administratorLogin;
+  }
+
+  // administrator_login_password - computed: false, optional: false, required: true
+  private _administratorLoginPassword?: string; 
+  public get administratorLoginPassword() {
+    return this.getStringAttribute('administrator_login_password');
+  }
+  public set administratorLoginPassword(value: string) {
+    this._administratorLoginPassword = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get administratorLoginPasswordInput() {
+    return this._administratorLoginPassword;
+  }
+
+  // fqdn - computed: true, optional: false, required: false
+  public get fqdn() {
+    return this.getStringAttribute('fqdn');
+  }
+
+  // id - computed: true, optional: true, required: false
+  private _id?: string; 
+  public get id() {
+    return this.getStringAttribute('id');
+  }
+  public set id(value: string) {
+    this._id = value;
+  }
+  public resetId() {
+    this._id = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get idInput() {
+    return this._id;
+  }
+
+  // location - computed: false, optional: false, required: true
+  private _location?: string; 
+  public get location() {
+    return this.getStringAttribute('location');
+  }
+  public set location(value: string) {
+    this._location = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get locationInput() {
+    return this._location;
+  }
+
+  // name - computed: false, optional: false, required: true
+  private _name?: string; 
+  public get name() {
+    return this.getStringAttribute('name');
+  }
+  public set name(value: string) {
+    this._name = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get nameInput() {
+    return this._name;
+  }
+
+  // resource_group_name - computed: false, optional: false, required: true
+  private _resourceGroupName?: string; 
+  public get resourceGroupName() {
+    return this.getStringAttribute('resource_group_name');
+  }
+  public set resourceGroupName(value: string) {
+    this._resourceGroupName = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get resourceGroupNameInput() {
+    return this._resourceGroupName;
+  }
+
+  // sku_name - computed: false, optional: false, required: true
+  private _skuName?: string; 
+  public get skuName() {
+    return this.getStringAttribute('sku_name');
+  }
+  public set skuName(value: string) {
+    this._skuName = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get skuNameInput() {
+    return this._skuName;
+  }
+
+  // ssl_enforcement - computed: false, optional: false, required: true
+  private _sslEnforcement?: string; 
+  public get sslEnforcement() {
+    return this.getStringAttribute('ssl_enforcement');
+  }
+  public set sslEnforcement(value: string) {
+    this._sslEnforcement = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get sslEnforcementInput() {
+    return this._sslEnforcement;
+  }
+
+  // tags - computed: false, optional: true, required: false
+  private _tags?: { [key: string]: string }; 
+  public get tags() {
+    return this.getStringMapAttribute('tags');
+  }
+  public set tags(value: { [key: string]: string }) {
+    this._tags = value;
+  }
+  public resetTags() {
+    this._tags = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get tagsInput() {
+    return this._tags;
+  }
+
+  // version - computed: false, optional: false, required: true
+  private _version?: string; 
+  public get version() {
+    return this.getStringAttribute('version');
+  }
+  public set version(value: string) {
+    this._version = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get versionInput() {
+    return this._version;
+  }
+
+  // storage_profile - computed: false, optional: false, required: true
+  private _storageProfile = new MysqlServerStorageProfileOutputReference(this, "storage_profile");
+  public get storageProfile() {
+    return this._storageProfile;
+  }
+  public putStorageProfile(value: MysqlServerStorageProfile) {
+    this._storageProfile.internalValue = value;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get storageProfileInput() {
+    return this._storageProfile.internalValue;
+  }
+
+  // timeouts - computed: false, optional: true, required: false
+  private _timeouts = new MysqlServerTimeoutsOutputReference(this, "timeouts");
+  public get timeouts() {
+    return this._timeouts;
+  }
+  public putTimeouts(value: MysqlServerTimeouts) {
+    this._timeouts.internalValue = value;
+  }
+  public resetTimeouts() {
+    this._timeouts.internalValue = undefined;
+  }
+  // Temporarily expose input value. Use with caution.
+  public get timeoutsInput() {
+    return this._timeouts.internalValue;
+  }
+
+  // =========
+  // SYNTHESIS
+  // =========
+
+  protected synthesizeAttributes(): { [name: string]: any } {
+    return {
+      administrator_login: cdktf.stringToTerraform(this._administratorLogin),
+      administrator_login_password: cdktf.stringToTerraform(this._administratorLoginPassword),
+      id: cdktf.stringToTerraform(this._id),
+      location: cdktf.stringToTerraform(this._location),
+      name: cdktf.stringToTerraform(this._name),
+      resource_group_name: cdktf.stringToTerraform(this._resourceGroupName),
+      sku_name: cdktf.stringToTerraform(this._skuName),
+      ssl_enforcement: cdktf.stringToTerraform(this._sslEnforcement),
+      tags: cdktf.hashMapper(cdktf.stringToTerraform)(this._tags),
+      version: cdktf.stringToTerraform(this._version),
+      storage_profile: mysqlServerStorageProfileToTerraform(this._storageProfile.internalValue),
+      timeouts: mysqlServerTimeoutsToTerraform(this._timeouts.internalValue),
+    };
+  }
+
+  protected synthesizeHclAttributes(): { [name: string]: any } {
+    const attrs = {
+      administrator_login: {
+        value: cdktf.stringToHclTerraform(this._administratorLogin),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      administrator_login_password: {
+        value: cdktf.stringToHclTerraform(this._administratorLoginPassword),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      id: {
+        value: cdktf.stringToHclTerraform(this._id),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      location: {
+        value: cdktf.stringToHclTerraform(this._location),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      name: {
+        value: cdktf.stringToHclTerraform(this._name),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      resource_group_name: {
+        value: cdktf.stringToHclTerraform(this._resourceGroupName),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      sku_name: {
+        value: cdktf.stringToHclTerraform(this._skuName),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      ssl_enforcement: {
+        value: cdktf.stringToHclTerraform(this._sslEnforcement),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      tags: {
+        value: cdktf.hashMapperHcl(cdktf.stringToHclTerraform)(this._tags),
+        isBlock: false,
+        type: "map",
+        storageClassType: "stringMap",
+      },
+      version: {
+        value: cdktf.stringToHclTerraform(this._version),
+        isBlock: false,
+        type: "simple",
+        storageClassType: "string",
+      },
+      storage_profile: {
+        value: mysqlServerStorageProfileToHclTerraform(this._storageProfile.internalValue),
+        isBlock: true,
+        type: "list",
+        storageClassType: "MysqlServerStorageProfileList",
+      },
+      timeouts: {
+        value: mysqlServerTimeoutsToHclTerraform(this._timeouts.internalValue),
+        isBlock: true,
+        type: "struct",
+        storageClassType: "MysqlServerTimeouts",
+      },
+    };
+
+    // remove undefined attributes
+    return Object.fromEntries(Object.entries(attrs).filter(([_, value]) => value !== undefined && value.value !== undefined ))
+  }
+}
