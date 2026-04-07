@@ -99,9 +99,11 @@ jobs:
             STEP 4 — Fix deprecated arguments
             In ${{ github.event.inputs.module_path }}/main.ts:
             - Replace  retentionPolicy:[{ days: X, enabled: Y }]  with  retentionPolicyInDays: X
-            - Remove the Retention_Policy_Enabled TerraformVariable declaration (no longer supported)
-            - Replace  features: { }  with  features: [{}]
-            - Fix any other deprecated arguments identified from the provider details in STEP 2.
+            - Remove the Retention_Policy_Enabled TerraformVariable declaration and its usage (no longer supported)
+            - Keep  features: {}  as an object — do NOT change it to an array [{}]
+            - Remove publicNetworkAccessEnabled from ContainerRegistry — this property does not exist in azurerm 4.x ContainerRegistryConfig
+            - After making changes, check the generated types under ./.gen/providers/azurerm/ to verify
+              property names are valid before finalising. Remove or rename any property not found in the type definition.
 
             STEP 5 — Fix tsconfig.json
             In ${{ github.event.inputs.module_path }}/tsconfig.json:

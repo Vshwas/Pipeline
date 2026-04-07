@@ -84,7 +84,7 @@ class MyStack extends TerraformStack {
     tenantId:Tenant_Id.value,
     clientId:Client_Id.value,
     clientSecret:Client_Secret.value,
-      features: { },
+      features: {},
     })
 
     new AzurermBackend(this, {
