@@ -133,16 +133,16 @@ Read the variables in `cdk.tf.json` (under `"variable"` key). Create a `var.tfva
 Resource_Group_Name        = "test-rg"
 Resource_Group_Location    = "centralindia"
 Environment                = "Development"
-Project_Name               = "ICloudAccelerator"
+Project_Name               = ""
 Purpose                    = "Testing"
-Subscription_Id            = "d9089190-b59b-4c09-8424-903d249b2f57"
+Subscription_Id            = ""
 Tenant_Id                  = "sample-tenant-id"
 Client_Id                  = "sample-client-id"
 Client_Secret              = "sample-client-secret"
 ```
 
 Use these test defaults where applicable:
-- Subscription: `d9089190-b59b-4c09-8424-903d249b2f57`
+- Subscription: ``
 - Resource Group: `test-rg-dcddeployment`
 - Storage Account: `stdcddeploy`
 - Key Vault: `kvdcddeploy`
