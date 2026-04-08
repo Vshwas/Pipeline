@@ -81,7 +81,7 @@ All resource and provider classes are re-exported from `./.gen/providers/azurerm
 
 | Field | Value |
 |---|---|
-| Subscription ID | `d9089190-b59b-4c09-8424-903d249b2f57` |
+| Subscription ID | `d9089190-b59b` |
 | Resource Group | `test-rg-dcddeployment` |
 | Storage Account | `stdcddeploy` |
 | Key Vault | `kvdcddeploy` |
