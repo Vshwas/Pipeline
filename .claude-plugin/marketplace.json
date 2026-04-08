@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "Pipeline",
-  "description": "Claude Code plugins for automating ICA (iCloudAccelerator) CDKTF Azure infrastructure workflows",
+  "description": "Claude Code plugins for automating ICA (repo) CDKTF Azure infrastructure workflows",
   "owner": {
     "name": "Vshwas",
     "url": "https://github.com/Vshwas"
